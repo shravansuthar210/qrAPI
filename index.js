@@ -10,23 +10,33 @@ app.use(express.json());
 app.use(cors());
 app.get("/", async (req, res) => {
   try {
-    const { base64 = false, text = "Hello world" } = req.body;
+    const {
+      base64 = false,
+      bgColor = "#FFF",
+      color = "#000",
+      margin = 1,
+      quality = 0.95,
+      text = "Hello world",
+      file="png",
+      transparent=false,
+      git 
+    } = req.body;
+
     const opts = {
-      errorCorrectionLevel: "H",
-      type: "terminal",
-      quality: 0.95,
-      margin: 1,
+      quality,
+      margin,
       color: {
-        dark: "#208698",
-        light: "#FFF",
+        dark: color,
+        light: bgColor,
       },
     };
-    QRCode.toDataURL(text,opts, function (err, url) {
+    QRCode.toDataURL(text, opts, function (err, url) {
       if (err) {
         console.log(err);
         return res.status(200).send(err);
       }
       console.log(url);
+
       res.status(200).send(url);
     });
   } catch (error) {
