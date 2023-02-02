@@ -7,11 +7,22 @@ const QRCode = require("qrcode");
 const fs = require("fs");
 const Jimp = require("jimp"); //------------------
 var path = require("path");
-
+// https://www.npmjs.com/package/qr-code-styling
+var QRCodeStyling = require("@chromapdx/qr-code-styling");
 const app = express();
 app.use(express.json());
 app.use(cors());
 // app.use("/",require("./route/createQRImage"))
+const { readFile } = require("fs");
+const { promisify } = require("util");
+const asyncReadFile = promisify(readFile);
+
+const returnSvg = async (path = "k.svg") => {
+  const data = await asyncReadFile(path);
+
+  // since fs.readFile returns a buffer, we should probably convert it to a string.
+  return data.toString();
+};
 app.get("/", async (req, res) => {
   try {
     const {
@@ -21,7 +32,7 @@ app.get("/", async (req, res) => {
       margin = 1,
       quality = 0.95,
       text = "Hello world",
-      type = "svg",//"image/png",
+      type = "svg", //"image/png",
       transparent = false,
       download = true,
       size,
@@ -36,8 +47,19 @@ app.get("/", async (req, res) => {
         light: bgColor,
       },
     };
-    const url=await QRCode.toFile('k.svg',text, opts);
-    res.status(200).send(url)
+
+    if (type === "svg" || type === "SVG") {
+      const url = await QRCode.toFile("k.svg", text, opts);
+      returnSvg()
+        .then((data) => {
+          res.status(200).send(data);
+        })
+        .catch((err) => {
+          console.log(`failed to read svg file: ${err}`);
+          res.status(200).send(data);
+        });
+    }
+
     // function (err, url) {
     //   if (err) {
     //     console.log(err);
