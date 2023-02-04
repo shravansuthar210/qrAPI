@@ -1,14 +1,12 @@
 const Jimp = require("jimp");
 const QRCode = require("qrcode");
-
 const { readFile } = require("fs");
 const { promisify } = require("util");
-const asyncReadFile = promisify(readFile);
 const formidable = require("formidable");
+const asyncReadFile = promisify(readFile);
+
 const returnSvg = async (path = "upload/k.svg") => {
   const data = await asyncReadFile(path);
-
-  // since fs.readFile returns a buffer, we should probably convert it to a string.
   return data.toString();
 };
 
@@ -25,19 +23,19 @@ const generateOR = async (req, res) => {
       }); // form.parse
     });
     const {
+      margin = 1,
+      color = "#000",
+      quality = 0.95,
       download = false,
       bgColor = "#FFF",
-      color = "#000",
-      margin = 1,
-      quality = 0.95,
       text = "Hello world",
       extension = "image/png",
     } = fields;
 
     const opts = {
-      extension,
-      quality,
       margin,
+      quality,
+      extension,
       color: {
         dark: color,
         light: bgColor,

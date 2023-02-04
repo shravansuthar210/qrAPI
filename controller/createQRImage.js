@@ -1,23 +1,21 @@
+const fs = require("fs");
 const Jimp = require("jimp");
+const path = require("path");
 const QRCode = require("qrcode");
 const formidable = require("formidable");
-const path = require("path");
-const fs = require("fs");
-
 const { createCanvas, loadImage } = require("canvas");
+
+
 async function create(dataForQRcode, center_image, width, cwidth, opts) {
   const canvas = createCanvas(width, width);
   QRCode.toCanvas(canvas, dataForQRcode, opts);
-
   const ctx = canvas.getContext("2d");
   const img = await loadImage(center_image);
   const center = (width - cwidth) / 2;
   ctx.drawImage(img, center, center, cwidth, cwidth);
   return canvas.toDataURL("image/png");
 }
-// route.post(
-//   "/centerLogoQr",
-//   multer({ storage }).single("image"),
+
 const QRImage = async (req, res) => {
   try {
     const form = formidable({ multiples: true });
